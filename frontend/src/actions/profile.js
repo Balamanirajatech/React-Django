@@ -31,7 +31,7 @@ export const getCurrentProfile = () => async dispatch => {
 // Get All Profiles
 export const getProfiles = () => async dispatch => {
   try {
-    const res = await api.get("/api/profiles");
+    const res = await api.get("/profiles");
     dispatch({ type: GET_PROFILES, payload: res.data });
   } catch (err) {
     dispatch({
@@ -44,7 +44,7 @@ export const getProfiles = () => async dispatch => {
 // Get Profile by ID
 export const getProfileById = userId => async dispatch => {
   try {
-    const res = await api.get(`/api/profile/${userId}`);
+    const res = await api.get(`/profile/${userId}`);
     dispatch({ type: GET_PROFILE, payload: res.data });
   } catch (err) {
     dispatch({
@@ -57,7 +57,7 @@ export const getProfileById = userId => async dispatch => {
 // Get Github Repos
 export const getGithubRepos = username => async dispatch => {
   try {
-    const res = await api.get(`/api/github/${username}`);
+    const res = await api.get(`/github/${username}`);
     dispatch({ type: GET_REPOS, payload: res.data });
   } catch (err) {
     dispatch({

@@ -16,7 +16,7 @@ import {
 // Get posts
 export const getPosts = () => async dispatch => {
   try {
-    const res = await api.get("/api/posts");
+    const res = await api.get("/posts");
 
     dispatch({ type: GET_POSTS, payload: res.data });
   } catch (err) {
@@ -30,7 +30,7 @@ export const getPosts = () => async dispatch => {
 // Get post
 export const getPost = postId => async dispatch => {
   try {
-    const res = await api.get(`/api/posts/${postId}`);
+    const res = await api.get(`/posts/${postId}`);
 
     dispatch({ type: GET_POST, payload: res.data });
   } catch (err) {
