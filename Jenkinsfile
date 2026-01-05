@@ -4,14 +4,15 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Balamanirajatech/React-Django-Projet.git'
+                git branch: 'master',
+                    credentialsId: 'github-token',
+                    url: 'https://github.com/Balamanirajatech/React-Django.git'
             }
         }
 
         stage('Build') {
             steps {
-                echo "Code checkout successful"
+                echo "Checkout successful"
             }
         }
     }
