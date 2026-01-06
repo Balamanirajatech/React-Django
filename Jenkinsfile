@@ -4,7 +4,7 @@ pipeline {
   environment {
     DOCKER_USER = "balamaniraja"
     FRONT_IMAGE = "react"
-    BACK_IMAGE = "django"
+    BACK_IMAGE  = "django"
   }
 
   stages {
@@ -18,13 +18,19 @@ pipeline {
 
     stage('Build Frontend') {
       steps {
-        sh 'cd frontend && docker build -t $DOCKER_USER/$FRONT_IMAGE:latest .'
+        sh '''
+          cd frontend
+          docker build -t $DOCKER_USER/$FRONT_IMAGE:latest .
+        '''
       }
     }
 
     stage('Build Backend') {
       steps {
-        sh 'cd backend && docker build -t $DOCKER_USER/$BACK_IMAGE:latest .'
+        sh '''
+          cd backend
+          docker build -t $DOCKER_USER/$BACK_IMAGE:latest .
+        '''
       }
     }
 
@@ -32,13 +38,14 @@ pipeline {
       steps {
         withCredentials([usernamePassword(
           credentialsId: 'dockerhub-creds',
-          usernameVariable: 'USER',
-          passwordVariable: 'PASS'
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
         )]) {
           sh '''
-            echo $PASS | docker login -u $USER --password-stdin
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             docker push $DOCKER_USER/$FRONT_IMAGE:latest
             docker push $DOCKER_USER/$BACK_IMAGE:latest
+            docker logout
           '''
         }
       }
@@ -47,7 +54,6 @@ pipeline {
     stage('Deploy') {
       steps {
         sh '''
-          docker-compose pull
           docker-compose up -d
         '''
       }
