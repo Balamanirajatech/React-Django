@@ -1,49 +1,70 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    DOCKER_USER = "balamaniraja"
-    FRONT_IMAGE = "react"
-    BACK_IMAGE  = "django"
-  }
+    environment {
+        // DockerHub info
+        DOCKER_USER = "balamaniraja"
+        FRONT_IMAGE = "react-frontend"
+        BACK_IMAGE  = "django-backend"
 
-  stages {
-
-    stage('Build Frontend') {
-      steps {
-        sh 'cd frontend && docker build -t $DOCKER_USER/$FRONT_IMAGE:latest .'
-      }
+        // Path to docker-compose.yml
+        DOCKER_COMPOSE_PATH = '/home/ubuntu/React-Django/docker-compose.yml'
     }
 
-    stage('Build Backend') {
-      steps {
-        sh 'cd backend && docker build -t $DOCKER_USER/$BACK_IMAGE:latest .'
-      }
-    }
-
-    stage('Push Images') {
-      steps {
-        withCredentials([usernamePassword(
-          credentialsId: 'dockerhub-creds',
-          usernameVariable: 'USER',
-          passwordVariable: 'PASS'
-        )]) {
-          sh '''
-            echo $PASS | docker login -u $USER --password-stdin
-            docker push $DOCKER_USER/$FRONT_IMAGE:latest
-            docker push $DOCKER_USER/$BACK_IMAGE:latest
-          '''
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the repo
+                git branch: 'main', url: 'https://github.com/Balamanirajatech/React-Django.git'
+            }
         }
-      }
+
+        stage('Build Frontend') {
+            steps {
+                dir('frontend') {
+                    sh "docker build -t $DOCKER_USER/$FRONT_IMAGE:latest ."
+                }
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                dir('backend') {
+                    sh "docker build -t $DOCKER_USER/$BACK_IMAGE:latest ."
+                }
+            }
+        }
+
+        stage('Push Images to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',  // Add DockerHub credentials in Jenkins
+                    usernameVariable: 'DOCKER_USER_VAR',
+                    passwordVariable: 'DOCKER_PASS_VAR'
+                )]) {
+                    sh '''
+                        echo $DOCKER_PASS_VAR | docker login -u $DOCKER_USER_VAR --password-stdin
+                        docker push $DOCKER_USER/$FRONT_IMAGE:latest
+                        docker push $DOCKER_USER/$BACK_IMAGE:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            steps {
+                sh "docker-compose -f ${DOCKER_COMPOSE_PATH} pull"
+                sh "docker-compose -f ${DOCKER_COMPOSE_PATH} up -d --build"
+            }
+        }
     }
 
-    stage('Deploy') {
-      steps {
-        sh '''
-          docker compose pull
-          docker compose up -d
-        '''
-      }
+    post {
+        success {
+            echo "CI/CD pipeline completed successfully! 🎉"
+        }
+        failure {
+            echo "Pipeline failed! ❌ Check the logs for errors."
+        }
     }
-  }
 }
