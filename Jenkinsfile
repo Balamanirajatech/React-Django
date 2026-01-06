@@ -40,8 +40,8 @@ pipeline {
     stage('Deploy') {
       steps {
         sh '''
-          docker-compose pull
-          docker-compose up -d
+          docker compose pull
+          docker compose up -d
         '''
       }
     }
