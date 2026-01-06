@@ -15,7 +15,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the repo
-                git branch: 'main', url: 'https://github.com/Balamanirajatech/React-Django.git'
+                git branch: 'master', url: 'https://github.com/Balamanirajatech/React-Django.git'
             }
         }
 
