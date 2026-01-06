@@ -53,8 +53,8 @@ pipeline {
 
         stage('Deploy with Docker Compose') {
             steps {
-                sh "docker-compose -f ${DOCKER_COMPOSE_PATH} pull"
-                sh "docker-compose -f ${DOCKER_COMPOSE_PATH} up -d --build"
+                sh "docker compose -f ${DOCKER_COMPOSE_PATH} pull"
+                sh "docker compose -f ${DOCKER_COMPOSE_PATH} up -d --build"
             }
         }
     }
