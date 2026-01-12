@@ -23,3 +23,11 @@ node_modules/
 bower_components/
 .env
 
+
+# Terraform
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+
+
+
