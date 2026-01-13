@@ -44,8 +44,19 @@ pipeline {
     stage('Deploy to EKS') {
       steps {
         sh '''
+          # Configure kubectl for EKS
+          aws eks update-kubeconfig --region ap-south-1 --name devops-cluster
+
+          # Apply all YAML manifests (creates or updates deployments & services)
+          kubectl apply -f K8s/
+
+          # Update images with new tags
           kubectl set image deployment/frontend frontend=$DOCKER_USER/$FRONT_IMAGE:$TAG
           kubectl set image deployment/backend backend=$DOCKER_USER/$BACK_IMAGE:$TAG
+
+          # Wait for rollout to complete
+          kubectl rollout status deployment/frontend
+          kubectl rollout status deployment/backend
         '''
       }
     }
